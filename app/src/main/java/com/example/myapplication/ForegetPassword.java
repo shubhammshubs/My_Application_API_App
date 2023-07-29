@@ -7,12 +7,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.text.method.LinkMovementMethod;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,34 +21,20 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class ForegetPassword extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
     private static final int REQUEST_CODE_PERMISSIONS = 100;
     private static final int PERMISSIONS_REQUEST_READ_PHONE_STATE = 1;
     private String phoneNumber;
-    private TextView mobileText,forget_Password;
-    private EditText passwordEditText;
+    private TextView mobileText;
+    private EditText passwordEditText,newpasswordEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_foreget_password);
 
-        TextView forgetPass =(TextView)findViewById(R.id.forget_Pass);
-
-        forgetPass.setMovementMethod(LinkMovementMethod.getInstance());
-        forgetPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                Intent intent = new Intent(MainActivity.this, ForegetPassword.class);
-                startActivity(intent);
-            }
-        });
-
-//      Code for all necessary Permissions.
         if (!checkPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
                 || !checkPermission(android.Manifest.permission.INTERNET)
                 || !checkPermission(android.Manifest.permission.READ_SMS)
@@ -70,15 +53,15 @@ public class MainActivity extends AppCompatActivity {
         }
         // Set the text of the TextView to the phone number, if it's available
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
+            requestPermissions(new String[]{android.Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
         } else {
             retrieveMobileNumber();
         }
     }
-//  Get Mobile Number directly to Phone number
+
     private void retrieveMobileNumber() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
         } else {
             String fullNumber = telephonyManager.getLine1Number();
@@ -89,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-//  Check for Permissions.
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -108,20 +91,22 @@ public class MainActivity extends AppCompatActivity {
     private void setupActivity() {
         mobileText = findViewById(R.id.mobile_textview);
         passwordEditText = findViewById(R.id.password_edittext);
-        Button loginButton = findViewById(R.id.login_button);
-
+        Button RestePwdButton = findViewById(R.id.login_button);
+        newpasswordEditText = findViewById(R.id.password_edittext3);
 
         retrieveMobileNumber();
         mobileText.setText(phoneNumber);
 
-        loginButton.setOnClickListener(v -> {
+        RestePwdButton.setOnClickListener(v -> {
             String mobile = mobileText.getText().toString();
             String password = passwordEditText.getText().toString();
+            String newpwd = newpasswordEditText.getText().toString();
 
             MyApplication.mobile = mobile;
 
             if (mobile.isEmpty() || password.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Please enter both mobile and password", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Please enter  mobile,password and New Password", Toast.LENGTH_SHORT).show();
+
             } else {
                 // Create a Bundle to pass mobile to SignInFragment
                 Bundle bundle = new Bundle();
@@ -133,39 +118,26 @@ public class MainActivity extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 // Create a LoginService instance using the Retrofit instance
-                LoginService service = retrofit.create(LoginService.class);
+                ResetPassword service = retrofit.create(ResetPassword.class);
                 // Call the login API with the given mobile and password
-                Call<String> call = service.login(mobile, password);
+                Call<String> call = service.resate(mobile, password,newpwd);
                 // Handle the response
                 call.enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
-                            String loginResponse = response.body();
-                            if (loginResponse != null && loginResponse.equals("Login Done")) {
+                            String ResteResponse = response.body();
+                            if (ResteResponse != null || ResteResponse.equals("Login Done")) {
+                                Toast.makeText(getApplicationContext(), "Password reset successful", Toast.LENGTH_SHORT).show();
 
-//                                // Modify the User class to match the JSON response format
-//                                User user = new User();
-//                                user.setId("1");
-//                                user.setFname("John");
-//                                user.setLname("Doe");
-//                                user.setEmpId("123456");
-//                                user.setEmail("john.doe@example.com");
-//                                user.setMobile(mobile);
-//                                user.setDepartment_name("HR");
-
-                                // Login successful, start the DashboardActivity
-                                Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-                                startActivity(intent);
-                                finish();
                             } else {
                                 // Login failed, display an error message
-                                String errorMessage = "Invalid username or password";
+                                String errorMessage = "Password reset failed. Please try again later.";
                                 Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             // Login failed, display an error message
-                            String errorMessage = "Unable to login. Please try again later";
+                            String errorMessage = "Unable to Reset Password. Please try again later";
                             Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -179,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
     private boolean checkPermission(String permission) {

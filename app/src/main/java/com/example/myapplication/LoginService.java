@@ -8,6 +8,18 @@ import retrofit2.http.POST;
 
 public interface LoginService {
     @FormUrlEncoded
-    @POST("Attend.php?apicall=login")
-    Call<String> login(@Field("mobile") String mobile, @Field("password") String password);
+    @POST("data.php?apicall=login")
+    Call<String> login(
+            @Field("mobile") String mobile,
+            @Field("password") String password
+    );
+
+
+    @FormUrlEncoded
+    @POST("data.php?apicall=read")
+    Call<String> getUsername(
+            @Field("mobile") String mobile ,
+             @Field("fname") String fname
+    );
+
 }

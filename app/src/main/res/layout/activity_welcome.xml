@@ -11,15 +11,57 @@
         android:layout_width="match_parent"
         android:layout_height="600dp"/>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:layout_gravity="start|bottom"
+        android:paddingLeft="10dp"
+        >
+
+        <TextView
+            android:id="@+id/nameLabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginStart="70dp"
+            android:text="Welcome "
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/nameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+
 
 
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/profile_fregment"
         android:layout_alignParentBottom="true"
         android:text="Profile"
         />
+
+    <Button
+        android:id="@+id/Logout_fregment"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/profile_fregment"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:text="Logout" />
 
 </RelativeLayout>

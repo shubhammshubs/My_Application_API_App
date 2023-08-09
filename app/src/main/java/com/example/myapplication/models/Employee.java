@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.models;
 
 public class Employee {
 //    private String id;
@@ -20,15 +20,7 @@ public class Employee {
         this.department_name = department_name;
     }
 
-    //    private String department_name;
 
-//    public String getDepartment_name() {
-//        return department_name;
-//    }
-
-//    public String getId() {
-//        return id;
-//    }
 
     public String getFname() {
         return fname;

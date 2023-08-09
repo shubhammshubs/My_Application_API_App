@@ -1,27 +1,22 @@
-package com.example.myapplication;
+package com.example.myapplication.Classes;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.myapplication.Fregement_Activitiy.ProfileFregment;
+import com.example.myapplication.R;
+import com.example.myapplication.models.Employee;
+import com.example.myapplication.services.EmployeeApi;
 
 import java.util.List;
 
@@ -37,11 +32,11 @@ public class WelcomeActivity extends AppCompatActivity {
     String mobile = MyApplication.mobile;
     String username;
     String fname;
-    Button button;
+    Button button,button1;
 
-//    public WelcomeActivity() {
-//        // Required empty public constructor
-//    }
+    public WelcomeActivity() {
+        // Required empty public constructor
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +52,17 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openfragement (new ProfileFregment());
+            }
+
+        });
+
+        button1 = findViewById(R.id.Logout_fregment);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(WelcomeActivity.this,MainActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -75,33 +81,39 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Create a Retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://apip.trifrnd.in/portal/")
+                .baseUrl("https://apip.trifrnd.com/portal/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         // Create a Retrofit service for the API interface
-        LoginService attendanceService = retrofit.create(LoginService.class);
+        EmployeeApi employeeApi = retrofit.create(EmployeeApi.class);
 
         // Call the API to get the attendance data for the mobile number
-        Call<String> call = attendanceService.getUsername(mobile,fname);
-
-        call.enqueue(new Callback<String>() {
+        Call<List<Employee>> call =employeeApi.getAllEmployees();
+        call.enqueue(new Callback<List<Employee>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<List<Employee>> call, Response<List<Employee>> response) {
                 if (response.isSuccessful()) {
-                    username =response.body();
-                    TextView userNameTextView = findViewById(R.id.username);
-                    userNameTextView.setText(username);
+                    List<Employee> employees =response.body();
+
+                    Employee targetEmployee = null;
+                    for (Employee employee : employees) {
+                        if (employee.getMobile().equals(mobile)){
+                            targetEmployee = employee;
+                            break;
+                        }
+                    }
+                    TextView nameTextView = findViewById(R.id.nameTextView);
+                    nameTextView.setText(targetEmployee.getFname());
                 }
 
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(WelcomeActivity.this, "Failed to fetch username", Toast.LENGTH_SHORT).show();
-
+            public void onFailure(Call<List<Employee>> call, Throwable t) {
 
             }
         });
+
     }
 }

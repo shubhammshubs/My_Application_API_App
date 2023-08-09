@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Fregement_Activitiy;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
-import com.example.myapplication.User;
+
+import com.example.myapplication.models.Employee;
+import com.example.myapplication.Classes.MyApplication;
+import com.example.myapplication.R;
+import com.example.myapplication.services.EmployeeApi;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,7 +29,7 @@ public class ProfileFregment extends Fragment {
 
     private SharedPreferences pref;
 
-    private TextView nameTextView,empIdTextView,emailTextView,mobileTextView;
+//    private TextView nameTextView,empIdTextView,emailTextView,mobileTextView;
 
 
 
@@ -34,37 +37,14 @@ public class ProfileFregment extends Fragment {
     public ProfileFregment() {
         // Required empty public constructor
     }
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_profile_fregment, container, false);
-//        initViews(view);
-//        return view;
-//    }
-//
-//
-//    public void onViewCreated(View view,Bundle savedInstanceState) {
-//        pref =getActivity().getPreferences(0);
-//        nameTextView.setText(pref.getString(Util.NAME,""));
-//        empIdTextView.setText(pref.getString(Util.empId,""));
-//        emailTextView.setText(pref.getString(Util.EMAIL,""));
-//        mobileTextView.setText(pref.getString(Util.mobile,""));
-//
-//    }
-//
-//    private void initViews(View view) {
-//        TextView nameTextView =(TextView) view.findViewById(R.id.nameTextView);
-//        TextView empIdTextView =(TextView) view.findViewById(R.id.empIdTextView);
-//        TextView emailTextView =(TextView) view.findViewById(R.id.emailTextView);
-//        TextView mobileTextView =(TextView) view.findViewById(R.id.mobileTextView);
-////        TextView departmentTextView=(TextView) view.findViewById(R.id.departmentTextView);
-//
-//
-//    }
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,22 +53,22 @@ public class ProfileFregment extends Fragment {
 
         // Create the Retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://apip.trifrnd.in/portal/")
+                .baseUrl("https://apip.trifrnd.com/portal/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         // Create an instance of your EmployeeApi interface
         EmployeeApi employeeApi = retrofit.create(EmployeeApi.class);
 
         // Make the API call
-        Call<List<User>> call = employeeApi.getAllEmployees();
-        call.enqueue(new Callback<List<User>>() {
+        Call<List<Employee>> call =employeeApi.getAllEmployees();
+        call.enqueue(new Callback<List<Employee>>() {
             @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+            public void onResponse(Call<List<Employee>> call, Response<List<Employee>> response) {
                 if (response.isSuccessful()) {
-                    List<User> employees = response.body();
+                    List<Employee> employees = response.body();
                     // Find the Employee with the matching mobile number
-                    User targetEmployee = null;
-                    for (User employee : employees) {
+                    Employee targetEmployee = null;
+                    for (Employee employee : employees) {
                         if (employee.getMobile().equals(mobile)) {
                             targetEmployee = employee;
                             break;
@@ -101,7 +81,7 @@ public class ProfileFregment extends Fragment {
                     TextView mobileTextView = view.findViewById(R.id.mobileTextView);
                     TextView departmentTextView=view.findViewById(R.id.departmentTextView);
 
-//                    nameTextView.setText(targetEmployee.getFullName());
+                    nameTextView.setText(targetEmployee.getFullName());
                     empIdTextView.setText(targetEmployee.getEmpId());
                     emailTextView.setText(targetEmployee.getEmail());
                     mobileTextView.setText(targetEmployee.getMobile());
@@ -111,15 +91,7 @@ public class ProfileFregment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                try {
-                    Toast.makeText(WelcomeActivity.class.newInstance(), "Failed to fetch user details", Toast.LENGTH_SHORT).show();
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (java.lang.InstantiationException e) {
-                    throw new RuntimeException(e);
-                }
-
+            public void onFailure(Call<List<Employee>> call, Throwable t) {
 
             }
         });
